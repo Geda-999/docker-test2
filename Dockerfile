@@ -46,13 +46,15 @@
 
 
 # ============================================nginx 配置文件
-# 第一步：构建阶段
+# 第一步：构建阶段（使用 pnpm）
 FROM node:20-alpine AS build
 WORKDIR /opt/app
-COPY package*.json ./
-RUN npm install
+# 启用 corepack 并激活 pnpm（使用锁定文件确保可重复安装）
+RUN corepack enable
+COPY package.json pnpm-lock.yaml ./
+RUN pnpm install --frozen-lockfile
 COPY . .
-RUN npm run build
+RUN pnpm build
 RUN echo "🎉 编 🎉 译 🎉 成 🎉 功 🎉"
 
 # 第二步：生产环境，nginx 服务静态文件
